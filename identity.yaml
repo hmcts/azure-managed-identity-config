@@ -1,0 +1,18 @@
+
+- name: ccd
+  environments: 
+    - sandbox
+    - saat
+  keyvault:
+    name: fake-ccd-saat
+    resource_group: fake-ccd-shared-saat
+    additional_identity_access:
+    - cmc
+- name: cmc
+  environments:
+    - saat
+  keyvault:
+    name: fake-cmc-saat
+    resource_group: fake-cmc-saat
+    additional_identity_access:
+    - ccd
