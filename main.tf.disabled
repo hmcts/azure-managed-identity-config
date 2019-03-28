@@ -1,0 +1,20 @@
+
+resource "azurerm_resource_group" "test" {
+  name     = "timj-identity-sandbox"
+  location = "${var.location}"
+}
+
+resource "azurerm_user_assigned_identity" "team_identity" {
+  resource_group_name = "${azurerm_resource_group.test.name}"
+  location            = "${azurerm_resource_group.test.location}"
+
+  name = "timj-sandbox"
+}
+
+resource "azurerm_role_assignment" "identity_permissions" {
+  scope                = "/subscriptions/${var.subscription_id}/resourcegroups/${var.kv_rg}/providers/Microsoft.KeyVault/vaults/${var.kv_name}"
+  role_definition_name = "Reader"
+  principal_id         = "${azurerm_user_assigned_identity.team_identity.principal_id}"
+}
+
+
