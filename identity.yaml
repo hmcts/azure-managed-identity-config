@@ -4,11 +4,11 @@
     - sandbox
     - saat
   keyvault:
-    name: fake-ccd-saat
-    resource_group: fake-ccd-shared-saat
+    name: fake-ccd
+    resource_group: fake-ccd-shared
 - name: cmc
   environments:
     - saat
   keyvault:
-    name: fake-cmc-saat
-    resource_group: fake-cmc-saat
+    name: fake-cmc
+    resource_group: fake-cmc
