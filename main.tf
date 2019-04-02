@@ -12,6 +12,7 @@ module "azure-identity-management" {
   number_of_identities = "${length(local.identities)}"
   location             = "${var.location}"
   resource_group_name  = "${azurerm_resource_group.identity_group.name}"
+  tenant_id            = "${var.tenant_id}"
 }
 
 resource "azurerm_resource_group" "identity_group" {

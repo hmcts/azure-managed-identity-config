@@ -2,9 +2,7 @@ variable "env" {}
 
 variable "location" {}
 
-variable "tenant_id" {
-  default = "a0d77fc4-df1e-4b0d-8e35-46750ca5a672"
-}
+variable "tenant_id" {}
 
 variable "identity_mapping" {
   type = "list"
