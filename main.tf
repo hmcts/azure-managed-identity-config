@@ -1,23 +1,22 @@
 locals {
-  input          = "identity.yaml"
-  identities     = "${split(";", data.external.identities.result.identities)}"
-  keyvault_names = "${split(";", data.external.identities.result.keyvault_names)}"
-  keyvault_rgs   = "${split(";", data.external.identities.result.keyvault_rgs)}"
-
   identity_mapping = "${null_resource.identity_mapping.*.triggers}"
+  identities       = "${split(";", data.external.identities.result.identities)}"
+  keyvault_names   = "${split(";", data.external.identities.result.keyvault_names)}"
+  keyvault_rgs     = "${split(";", data.external.identities.result.keyvault_rgs)}"
 }
 
-data "azurerm_subscription" "primary" {}
+module "azure-identity-management" {
+  source               = "./module"
+  identity_mapping     = "${local.identity_mapping}"
+  env                  = "${var.env}"
+  number_of_identities = "${length(local.identities)}"
+  location             = "${var.location}"
+  resource_group_name  = "${azurerm_resource_group.identity_group.name}"
+}
 
-data "external" "identities" {
-  program = [
-    "python3",
-    "${path.module}/find-identities.py",
-  ]
-
-  query = {
-    env = "${var.env}"
-  }
+resource "azurerm_resource_group" "identity_group" {
+  name     = "managed-identities-${var.env}"
+  location = "${var.location}"
 }
 
 resource "null_resource" "identity_mapping" {
@@ -30,55 +29,17 @@ resource "null_resource" "identity_mapping" {
   }
 }
 
-resource "azurerm_user_assigned_identity" "team_identity" {
-  resource_group_name = "timj-identity-${var.env}"
-  location            = "${var.location}"
-
-  name = "${lookup(local.identity_mapping[count.index], "identity")}-${var.env}"
-
-  count = "${length(local.identities)}"
-}
-
-resource "azurerm_role_assignment" "identity_permissions" {
-  scope                = "${data.azurerm_subscription.primary.id}/resourcegroups/${lookup(local.identity_mapping[count.index], "keyvault_rg")}/providers/Microsoft.KeyVault/vaults/${lookup(local.identity_mapping[count.index], "keyvault_name")}"
-  role_definition_name = "Reader"
-  principal_id         = "${element(azurerm_user_assigned_identity.team_identity.*.principal_id, count.index)}"
-
-  count = "${length(local.identities)}"
-}
-
-data "azurerm_key_vault" "kv" {
-  name                = "${lookup(local.identity_mapping[count.index], "keyvault_name")}"
-  resource_group_name = "${lookup(local.identity_mapping[count.index], "keyvault_rg")}"
-
-  count = "${length(local.identities)}"
-}
-
-resource "azurerm_key_vault_access_policy" "identity_access_policy" {
-  key_vault_id = "${element(data.azurerm_key_vault.kv.*.id, count.index)}"
-
-  object_id = "${element(azurerm_user_assigned_identity.team_identity.*.principal_id, count.index)}"
-  tenant_id = "${var.tenant_id}"
-
-  certificate_permissions = [
-    "get",
-    "list",
+data "external" "identities" {
+  program = [
+    "python3",
+    "${path.module}/find-identities.py",
   ]
 
-  key_permissions = [
-    "get",
-    "list",
-  ]
-
-  secret_permissions = [
-    "get",
-    "list",
-  ]
-
-  count = "${length(local.identities)}"
+  query = {
+    env = "${var.env}"
+  }
 }
 
-
-output "normal" {
-  value = "${local.identity_mapping}"
+output "identity_mapping" {
+  value = "${module.azure-identity-management.identity_mapping}"
 }
