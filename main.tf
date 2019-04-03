@@ -11,13 +11,8 @@ module "azure-identity-management" {
   env                  = "${var.env}"
   number_of_identities = "${length(local.identities)}"
   location             = "${var.location}"
-  resource_group_name  = "${azurerm_resource_group.identity_group.name}"
+  resource_group_name  = "managed-identities-${var.env}" // rg must be pre-created
   tenant_id            = "${var.tenant_id}"
-}
-
-resource "azurerm_resource_group" "identity_group" {
-  name     = "managed-identities-${var.env}"
-  location = "${var.location}"
 }
 
 resource "null_resource" "identity_mapping" {

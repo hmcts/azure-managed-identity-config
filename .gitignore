@@ -14,3 +14,5 @@ tfplan
 
 .DS_Store
 __pycache__/
+
+tfsecrets.sh
