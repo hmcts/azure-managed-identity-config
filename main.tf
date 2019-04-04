@@ -27,7 +27,7 @@ resource "null_resource" "identity_mapping" {
 
 data "external" "identities" {
   program = [
-    "python3",
+    "python",
     "${path.module}/find-identities.py",
   ]
 
