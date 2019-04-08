@@ -2,6 +2,10 @@ provider "azurerm" {
   version = "=1.23.0"
 }
 
+terraform {
+ backend "azurerm" {}
+}
+
 provider "external" {
   version = "=1.1"
 }
