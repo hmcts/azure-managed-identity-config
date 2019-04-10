@@ -24,9 +24,9 @@ rl.on('line', (line) => {
                             return {
                                 env: environment.name,
                                 subscription_id: environment.subscription_id,
-                                name: mapping.name,
-                                keyvault_name: mapping.keyvault.name,
-                                keyvault_rg: mapping.keyvault.resource_group
+                                name: `${mapping.name}-${environment.name}`,
+                                keyvault_name: `${mapping.keyvault.name}-${environment.name}`,
+                                keyvault_rg: `${mapping.keyvault.resource_group}-${environment.name}`
                             }
                         }
                     )

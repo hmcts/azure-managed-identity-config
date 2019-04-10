@@ -1,5 +1,3 @@
-variable "env" {}
-
 variable "location" {}
 
 variable "tenant_id" {}

@@ -1,7 +1,7 @@
 provider "azurerm" {
-  subscription_id = ""
+  subscription_id = "a5453007-c32b-4336-9c79-3f643d817aea"
 
-  alias = "user"
+  alias = "a5453007-c32b-4336-9c79-3f643d817aea"
 }
 
 locals {
@@ -15,7 +15,6 @@ locals {
 module "azure-identity-management" {
   source               = "./module"
   identity_mapping     = "${local.identity_mapping}"
-  env                  = "${var.env}"
   number_of_identities = "${length(local.identities)}"
   location             = "${var.location}"
   resource_group_name  = "managed-identities-${var.env}" // rg must be pre-created
