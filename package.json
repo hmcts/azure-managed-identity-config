@@ -1,0 +1,23 @@
+{
+  "name": "azure-managed-identity-config",
+  "version": "1.0.0",
+  "description": "",
+  "main": "find-identities.js",
+  "dependencies": {
+    "yaml": "^1.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hmcts/azure-managed-identity-config.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hmcts/azure-managed-identity-config/issues"
+  },
+  "homepage": "https://github.com/hmcts/azure-managed-identity-config#readme"
+}

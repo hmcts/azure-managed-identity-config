@@ -16,3 +16,5 @@ tfplan
 __pycache__/
 
 tfsecrets.sh
+
+node_modules/
