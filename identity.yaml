@@ -10,15 +10,17 @@ mappings:
         subscription_id: *rpe_temp
       - name: saat
         subscription_id: *rpe_temp
-    keyvault:
-      name: fake-ccd
-      resource_group: fake-ccd-shared
+    keyvaults:
+      - name: fake-ccd
+        resource_group: fake-ccd-shared
+      - name: fake-ccd-ds-api
+        resource_group: fake-ccd-data-store-api
   - name: cmc
     environments:
       - name: saat
         subscription_id: *rpe_temp
       - name: prod
         subscription_id: Production-something
-    keyvault:
-      name: fake-cmc
-      resource_group: fake-cmc
+    keyvaults:
+      - name: fake-cmc
+        resource_group: fake-cmc
