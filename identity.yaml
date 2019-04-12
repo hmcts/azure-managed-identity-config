@@ -1,10 +1,9 @@
 subscriptions:
-#  - name: TEMP-DCD-RPE
    - &rpe_temp a5453007-c32b-4336-9c79-3f643d817aea
 
 mappings:
   - name: ccd
-    # define all management group / subscriptions / environments that the key vaults are present in
+    # define all environments that the key vaults are present in
     environments:
       - name: sandbox
         subscription_id: *rpe_temp
