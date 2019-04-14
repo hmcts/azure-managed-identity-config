@@ -2,12 +2,19 @@
   "name": "azure-managed-identity-config",
   "version": "1.0.0",
   "description": "",
-  "main": "find-identities.js",
+  "main": "ts-node run.ts",
   "dependencies": {
+    "@pulumi/azure": "^0.17.4",
+    "@pulumi/pulumi": "^0.17.6",
+    "@types/node": "^11.13.4",
+    "@types/yaml": "^1.0.2",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.3",
     "yaml": "^1.5.0"
   },
   "devDependencies": {},
   "scripts": {
+    "start": "ts-node run.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

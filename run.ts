@@ -1,7 +1,9 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
-const fs = require('fs')
-const YAML = require('yaml')
+import {readFileSync} from 'fs'
+import * as YAML from 'yaml'
+
+import {Environment, Identity, IdentityMapping, KeyVault} from "./models";
 
 const args = process.argv.slice(2)
 if (args.length !== 2) {
@@ -9,14 +11,14 @@ if (args.length !== 2) {
     process.exit(1)
 }
 
-const aks_sub = '50f88971-400a-4855-8924-c38a47112ce4'
-const env = 'saat'
+const env = args[0]
+const aksSubscription = args[1]
 
 const {spawnSync} = require('child_process')
 
-function handleKeyVaultUserManagedIdentity(mapping) {
+function handleKeyVaultUserManagedIdentity(mapping: Identity) {
     if (mapping.keyvaults) {
-        mapping.keyvaults.forEach(keyvault => {
+        mapping.keyvaults.forEach((keyvault: KeyVault) => {
             const run = spawnSync('./run.sh', {
                 env: {
                     KEYVAULT_GROUP: `${keyvault.resource_group}-${mapping.env}`,
@@ -25,7 +27,7 @@ function handleKeyVaultUserManagedIdentity(mapping) {
 
                     ENV: mapping.env,
                     IDENTITY_NAME: mapping.name,
-                    AKS_SUBSCRIPTION_ID: aks_sub
+                    AKS_SUBSCRIPTION_ID: aksSubscription
                 }
             })
 
@@ -42,13 +44,13 @@ function handleKeyVaultUserManagedIdentity(mapping) {
     }
 }
 
-const file = fs.readFileSync('./identity.yaml', 'utf8')
+const file = readFileSync('./identity.yaml', 'utf8')
 
-const message = YAML.parse(file);
+const mappings: IdentityMapping[] = YAML.parse(file).mappings;
 
-message.mappings
-    .map(mapping => mapping.environments
-        .map(environment => {
+mappings
+    .map((mapping: IdentityMapping) => mapping.environments
+        .map((environment: Environment) => {
                 return {
                     env: environment.name,
                     subscription_id: environment.subscription_id,
@@ -59,5 +61,5 @@ message.mappings
         )
     )
     .flat()
-    .filter(mapping => mapping.env === env)
+    .filter((mapping: Identity) => mapping.env === env)
     .forEach(handleKeyVaultUserManagedIdentity)
