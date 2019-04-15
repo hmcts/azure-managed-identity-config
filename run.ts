@@ -3,7 +3,7 @@
 import {readFileSync} from 'fs'
 import * as YAML from 'yaml'
 
-import {Environment, Identity, IdentityMapping, KeyVault} from "./models";
+import {Environment, Identity, IdentityMapping, KeyVault} from "./src/models";
 
 const args = process.argv.slice(2)
 if (args.length !== 2) {

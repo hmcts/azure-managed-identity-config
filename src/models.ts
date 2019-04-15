@@ -1,20 +1,20 @@
-export class IdentityMapping {
+export interface IdentityMapping {
     name: string
     environments: Environment[]
     keyvaults: KeyVault[]
 }
 
-export class Environment {
+export interface Environment {
     name: string
     subscription_id: string
 }
 
-export class KeyVault {
+export interface KeyVault {
     name: string
     resource_group: string
 }
 
-export class Identity {
+export interface Identity {
     env: string
     subscription_id: string
     name: string

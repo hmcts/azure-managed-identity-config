@@ -18,6 +18,7 @@
     "strictNullChecks": true
   },
   "files": [
-    "index.ts", "models.ts"
+    "index.ts",
+    "src/models.ts"
   ]
 }
