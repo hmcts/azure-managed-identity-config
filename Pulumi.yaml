@@ -1,0 +1,3 @@
+name: azure-managed-identity-config
+runtime: nodejs
+description: Azure managed identity config

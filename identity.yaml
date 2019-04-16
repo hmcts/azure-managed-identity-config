@@ -1,0 +1,25 @@
+subscriptions:
+   - &rpe_temp a5453007-c32b-4336-9c79-3f643d817aea
+
+mappings:
+  - name: ccd
+    # define all environments that the key vaults are present in
+    environments:
+      - name: sandbox
+        subscription_id: *rpe_temp
+      - name: saat
+        subscription_id: *rpe_temp
+    keyvaults:
+      - name: fake-ccd
+        resource_group: fake-ccd-shared
+      - name: fake-ccd-ds-api
+        resource_group: fake-ccd-data-store-api
+  - name: cmc
+    environments:
+      - name: saat
+        subscription_id: *rpe_temp
+      - name: prod
+        subscription_id: Production-something
+    keyvaults:
+      - name: fake-cmc
+        resource_group: fake-cmc
