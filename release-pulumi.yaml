@@ -1,0 +1,31 @@
+parameters:
+  node_version: 'v11.14.0'
+  azure_provider_version: 'v0.17.4'
+  state_store_subscription_id: 'a5453007-c32b-4336-9c79-3f643d817aea'
+  state_store_account_name: 'rpetemptfstate'
+  state_store_container_name: 'rpetemp'
+  stack_name: 'aad'
+  service_connection: 'azurerm_rpetemp_mi'
+
+steps:
+  - script: |
+      export PATH=~/.pulumi/bin:${PATH}
+
+      pulumi up --yes
+    env:
+      ARM_CLIENT_ID: $(umi-arm-client-id)
+      ARM_CLIENT_SECRET: $(umi-arm-client-secret)
+      ARM_SUBSCRIPTION_ID: $(umi-arm-subscription-id)
+      ARM_TENANT_ID: $(umi-arm-tenant-id)
+      ENV: $(env)
+    displayName: 'Pulumi Up'
+  - task: AzureCLI@1
+    inputs:
+      azureSubscription: ${{ parameters.service_connection }}
+      scriptLocation: inlineScript
+      inlineScript: |
+        az storage blob upload -f ~/.pulumi/stacks/${{ parameters.stack_name }}.json \
+          --container-name ${{ parameters.state_store_container_name }} --name pulumi/stacks/${{ parameters.stack_name }}.json \
+          --account-name ${{ parameters.state_store_account_name }} \
+          --subscription ${{ parameters.state_store_subscription_id }}
+    displayName: 'Upload pulumi state'

@@ -1,8 +1,4 @@
 name: azure-managed-identity-config pipeline
-trigger:
-  branches:
-    include:
-      - refs/tags/*
 pr:
   branches:
     include:
@@ -13,32 +9,7 @@ jobs:
     pool:
       vmImage: 'Ubuntu 16.04'
     steps:
-      - task: NodeTool@0
-        inputs:
-          versionSpec: 'v11.14.0'
-        displayName: 'Install Node.js'
-      - script: |
-          curl -fsSL https://get.pulumi.com | sh
-
-          export PATH=~/.pulumi/bin:${PATH}
-          pulumi plugin install resource azure v0.17.4
-          pulumi login --local
-
-          pulumi stack init aad
-        displayName: 'Install Pulumi'
-      - task: AzureCLI@1
-        inputs:
-          azureSubscription: azurerm_rpetemp_mi
-          scriptLocation: inlineScript
-          inlineScript: |
-            az storage blob download -f ~/.pulumi/stacks/aad.json \
-              --container-name rpetemp --name pulumi/stacks/aad.json \
-              --account-name rpetemptfstate \
-              --subscription a5453007-c32b-4336-9c79-3f643d817aea
-        displayName: 'Download pulumi state'
-      - task: Npm@1
-        inputs:
-          command: 'install'
+      - template: setup-pulumi.yaml
       - script: |
           export PATH=~/.pulumi/bin:${PATH}
 
@@ -46,7 +17,30 @@ jobs:
         env:
           ARM_CLIENT_ID: $(umi-arm-client-id)
           ARM_CLIENT_SECRET: $(umi-arm-client-secret)
-          ARM_SUBSCRIPTION_ID: $(umi-arm-tenant-id)
-          ARM_TENANT_ID: $(umi-arm-subscription-id)
+          ARM_SUBSCRIPTION_ID: $(umi-arm-subscription-id)
+          ARM_TENANT_ID: $(umi-arm-tenant-id)
           ENV: $(env)
         displayName: 'Pulumi preview'
+
+  - job: Release_RPETEMP
+    pool:
+      vmImage: 'Ubuntu 16.04'
+    condition: >
+      and(
+          succeeded(),
+          eq(variables['Build.SourceBranch'], 'refs/heads/feature/release-pipeline')
+        )
+    dependsOn: Validate
+    steps:
+      - template: setup-pulumi.yaml
+        parameters:
+          state_store_subscription_id: 'a5453007-c32b-4336-9c79-3f643d817aea'
+          state_store_account_name: 'rpetemptfstate'
+          state_store_container_name: 'rpetemp'
+          service_connection: 'azurerm_rpetemp_mi'
+      - template: release-pulumi.yaml
+        parameters:
+          state_store_subscription_id: 'a5453007-c32b-4336-9c79-3f643d817aea'
+          state_store_account_name: 'rpetemptfstate'
+          state_store_container_name: 'rpetemp'
+          service_connection: 'azurerm_rpetemp_mi'
