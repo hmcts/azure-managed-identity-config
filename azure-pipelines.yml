@@ -1,19 +1,52 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
+name: azure-managed-identity-config pipeline
 trigger:
-- master
+  branches:
+    include:
+      - refs/tags/*
+pr:
+  branches:
+    include:
+      - master
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+jobs:
+  - job: Validate
+    pool:
+      vmImage: 'Ubuntu 16.04'
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: 'v11.14.0'
+        displayName: 'Install Node.js'
+      - script: |
+          curl -fsSL https://get.pulumi.com | sh
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+          export PATH=~/.pulumi/bin:${PATH}
+          pulumi plugin install resource azure v0.17.4
+          pulumi login --local
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+          pulumi stack init aad
+        displayName: 'Install Pulumi'
+      - task: AzureCLI@1
+        inputs:
+          azureSubscription: azurerm_rpetemp_mi
+          scriptLocation: inlineScript
+          inlineScript: |
+            az storage blob download -f ~/.pulumi/stacks/aad.json \
+              --container-name rpetemp --name pulumi/stacks/aad.json \
+              --account-name rpetemptfstate \
+              --subscription a5453007-c32b-4336-9c79-3f643d817aea
+        displayName: 'Download pulumi state'
+      - task: Npm@1
+        inputs:
+          command: 'install'
+      - script: |
+          export PATH=~/.pulumi/bin:${PATH}
+
+          pulumi preview
+        env:
+          ARM_CLIENT_ID: $(umi-arm-client-id)
+          ARM_CLIENT_SECRET: $(umi-arm-client-secret)
+          ARM_SUBSCRIPTION_ID: $(umi-arm-tenant-id)
+          ARM_TENANT_ID: $(umi-arm-subscription-id)
+          ENV: $(env)
+        displayName: 'Pulumi preview'
