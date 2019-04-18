@@ -23,3 +23,10 @@ mappings:
     keyvaults:
       - name: fake-cmc
         resource_group: fake-cmc
+  - name: div
+    environments:
+      - name: saat
+        subscription_id: *rpe_temp
+    keyvaults:
+      - name: fake-div
+        resource_group: fake-div-demo
